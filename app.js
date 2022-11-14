@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
+const movieRoutes = require("./routes/movie");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/auth", authRoutes);
+app.use("/movies", movieRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
