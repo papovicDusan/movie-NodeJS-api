@@ -1,15 +1,17 @@
 const Movie = require("../models/movie");
 
 exports.getMovies = (req, res, next) => {
-  const page = parseInt(req.query.page);
+  const page = parseInt(req.query.page) || 1;
   const limit = 2;
+  const search = req.query.search || "";
 
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
 
   const results = {};
 
-  Movie.countDocuments()
+  Movie.find({ title: { $regex: search, $options: "i" } })
+    .countDocuments()
     .then((moviesNumber) => {
       results.count = moviesNumber;
 
@@ -21,7 +23,9 @@ exports.getMovies = (req, res, next) => {
         ? (results.previous = page - 1)
         : (results.previous = null);
 
-      return Movie.find().skip(startIndex).limit(limit);
+      return Movie.find({ title: { $regex: search, $options: "i" } })
+        .skip(startIndex)
+        .limit(limit);
     })
     .then((movies) => {
       res.status(200).json({
