@@ -1,9 +1,35 @@
 const Movie = require("../models/movie");
 
 exports.getMovies = (req, res, next) => {
-  Movie.find()
+  const page = parseInt(req.query.page);
+  const limit = 2;
+
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  const results = {};
+
+  Movie.countDocuments()
+    .then((moviesNumber) => {
+      results.count = moviesNumber;
+
+      endIndex < moviesNumber
+        ? (results.next = page + 1)
+        : (results.next = null);
+
+      startIndex > 0
+        ? (results.previous = page - 1)
+        : (results.previous = null);
+
+      return Movie.find().skip(startIndex).limit(limit);
+    })
     .then((movies) => {
-      res.status(200).json(movies);
+      res.status(200).json({
+        count: results.count,
+        next: results.next,
+        previous: results.previous,
+        results: movies,
+      });
     })
     .catch((err) => {
       if (!err.statusCode) {
