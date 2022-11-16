@@ -78,6 +78,7 @@ exports.createMovie = (req, res, next) => {
 exports.getMovie = (req, res, next) => {
   const movieId = req.params.movieId;
   Movie.findById(movieId)
+    .populate("comments")
     .then((movie) => {
       if (!movie) {
         const error = new Error("Could not find movie.");
