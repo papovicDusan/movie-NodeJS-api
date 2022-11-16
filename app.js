@@ -7,6 +7,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const movieRoutes = require("./routes/movie");
+const commentRoutes = require("./routes/comment");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/auth", authRoutes);
 app.use("/movies", movieRoutes);
+app.use("/comments", commentRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
