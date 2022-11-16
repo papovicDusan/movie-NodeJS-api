@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post("/", commentController.createComment);
 
+router.get("/movies/:movieId", commentController.getComments);
+
 router.get("/:commentId", commentController.getComment);
 
 module.exports = router;
