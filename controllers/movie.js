@@ -4,13 +4,23 @@ exports.getMovies = (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 2;
   const search = req.query.search || "";
+  const genre = req.query.genre || "";
+
+  const query = {};
+
+  if (search) {
+    query.title = { $regex: search, $options: "i" };
+  }
+  if (genre) {
+    query.genre = genre;
+  }
 
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
 
   const results = {};
 
-  Movie.find({ title: { $regex: search, $options: "i" } })
+  Movie.find(query)
     .countDocuments()
     .then((moviesNumber) => {
       results.count = moviesNumber;
@@ -23,9 +33,7 @@ exports.getMovies = (req, res, next) => {
         ? (results.previous = page - 1)
         : (results.previous = null);
 
-      return Movie.find({ title: { $regex: search, $options: "i" } })
-        .skip(startIndex)
-        .limit(limit);
+      return Movie.find(query).skip(startIndex).limit(limit);
     })
     .then((movies) => {
       res.status(200).json({
