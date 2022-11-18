@@ -14,6 +14,12 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  likes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Like",
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);

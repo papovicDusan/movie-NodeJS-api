@@ -1,13 +1,14 @@
 const express = require("express");
 
 const movieController = require("../controllers/movie");
+const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 
-router.get("/", movieController.getMovies);
+router.get("/", isAuth, movieController.getMovies);
 
-router.post("/", movieController.createMovie);
+router.post("/", isAuth, movieController.createMovie);
 
-router.get("/:movieId", movieController.getMovie);
+router.get("/:movieId", isAuth, movieController.getMovie);
 
 module.exports = router;
