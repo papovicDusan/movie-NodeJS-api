@@ -9,6 +9,10 @@ router.get("/", isAuth, movieController.getMovies);
 
 router.post("/", isAuth, movieController.createMovie);
 
+router.get("/:movieId/movies-genre", isAuth, movieController.getMoviesGenre);
+
+router.get("/movies-popular", isAuth, movieController.getMoviesPopular);
+
 router.get("/:movieId", isAuth, movieController.getMovie);
 
 module.exports = router;
