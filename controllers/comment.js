@@ -1,131 +1,82 @@
 const Comment = require("../models/comment");
 const Movie = require("../models/movie");
 
-exports.createComment = (req, res, next) => {
-  const content = req.body.content;
-  const movieId = req.body.movie_id;
+exports.createComment = async (req, res, next) => {
+  try {
+    const content = req.body.content;
+    const movieId = req.body.movie_id;
 
-  const comment = new Comment({
-    content: content,
-    movie: movieId,
-  });
-  comment
-    .save()
-    .then((comment) => {
-      return Movie.findById(movieId);
-    })
-    .then((movie) => {
-      movie.comments.push(comment);
-      return movie.save();
-    })
-    .then((movie) => {
-      res.status(201).json(comment);
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+    const commentNew = new Comment({
+      content: content,
+      movie: movieId,
     });
+    const comment = await commentNew.save();
+
+    const movie = await Movie.findById(movieId);
+    movie.comments.push(comment);
+    await movie.save();
+
+    res.status(201).json(comment);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
-// exports.getComments = (req, res, next) => {
-//   const movieId = req.params.movieId;
-//   const page = parseInt(req.query.page) || 1;
-//   const limit = 2;
+exports.getComments = async (req, res, next) => {
+  try {
+    const movieId = req.params.movieId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 2;
 
-//   const startIndex = (page - 1) * limit;
-//   const endIndex = page * limit;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
 
-//   const results = {};
+    const results = {};
 
-//   Comment.find({ movie: movieId })
-//     .countDocuments()
-//     .then((commentsNumber) => {
-//       results.count = commentsNumber;
+    const movie = await Movie.findById(movieId).populate("comments");
 
-//       endIndex < commentsNumber
-//         ? (results.next = page + 1)
-//         : (results.next = null);
+    results.count = movie.comments.length;
 
-//       startIndex > 0
-//         ? (results.previous = page - 1)
-//         : (results.previous = null);
+    endIndex < movie.comments.length
+      ? (results.next = page + 1)
+      : (results.next = null);
 
-//       return Comment.find({ movie: movieId }).skip(startIndex).limit(limit);
-//     })
-//     .then((comments) => {
-//       res.status(200).json({
-//         count: results.count,
-//         next: results.next,
-//         previous: results.previous,
-//         results: comments,
-//       });
-//     })
-//     .catch((err) => {
-//       if (!err.statusCode) {
-//         err.statusCode = 500;
-//       }
-//       next(err);
-//     });
-// };
+    startIndex > 0 ? (results.previous = page - 1) : (results.previous = null);
 
-exports.getComments = (req, res, next) => {
-  const movieId = req.params.movieId;
-  const page = parseInt(req.query.page) || 1;
-  const limit = 2;
+    const comments = movie.comments.slice(startIndex, startIndex + limit);
 
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-
-  const results = {};
-
-  Movie.findById(movieId)
-    .populate("comments")
-    .then((movie) => {
-      results.count = movie.comments.length;
-
-      endIndex < movie.comments.length
-        ? (results.next = page + 1)
-        : (results.next = null);
-
-      startIndex > 0
-        ? (results.previous = page - 1)
-        : (results.previous = null);
-
-      const comments = movie.comments.slice(startIndex, startIndex + limit);
-
-      res.status(200).json({
-        count: results.count,
-        next: results.next,
-        previous: results.previous,
-        results: comments,
-      });
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+    res.status(200).json({
+      count: results.count,
+      next: results.next,
+      previous: results.previous,
+      results: comments,
     });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
-exports.getComment = (req, res, next) => {
-  const commentId = req.params.commentId;
-  Comment.findById(commentId)
-    .populate("movie")
-    .then((comment) => {
-      if (!comment) {
-        const error = new Error("Could not find comment.");
-        error.statusCode = 404;
-        throw error;
-      }
-      res.status(200).json(comment);
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
+exports.getComment = async (req, res, next) => {
+  try {
+    const commentId = req.params.commentId;
+    const comment = await Comment.findById(commentId).populate("movie");
+
+    if (!comment) {
+      const error = new Error("Could not find comment.");
+      error.statusCode = 404;
+      throw error;
+    }
+    res.status(200).json(comment);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };

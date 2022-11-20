@@ -102,43 +102,6 @@ exports.createMovie = async (req, res, next) => {
   }
 };
 
-// exports.getMovie = (req, res, next) => {
-//   const movieId = req.params.movieId;
-//   let likes = null;
-//   let dislikes = null;
-//   let userLikeOrDislike = null;
-//   let movieLikesDislikes = {};
-
-//   Movie.findById(movieId)
-//     .populate("likes")
-//     .then((movie) => {
-//       if (!movie) {
-//         const error = new Error("Could not find movie.");
-//         error.statusCode = 404;
-//         throw error;
-//       }
-
-//       movieLikesDislikes = movie._doc;
-
-//       likes = movie.likes.filter((likeItem) => likeItem.like == 1).length;
-//       dislikes = movie.likes.filter((likeItem) => likeItem.like == -1).length;
-//       movieLikesDislikes.number_of_likes = likes;
-//       movieLikesDislikes.number_of_dislikes = dislikes;
-
-//       const like = movie.likes.find((likeItem) => likeItem.user == req.userId);
-//       like ? (userLike = like.like) : (userLike = 0);
-//       movieLikesDislikes.liked_or_disliked_user = userLike;
-
-//       res.status(200).json(movieLikesDislikes);
-//     })
-//     .catch((err) => {
-//       if (!err.statusCode) {
-//         err.statusCode = 500;
-//       }
-//       next(err);
-//     });
-// };
-
 exports.getMovie = async (req, res, next) => {
   try {
     const movieId = req.params.movieId;
@@ -195,6 +158,58 @@ exports.getMovie = async (req, res, next) => {
     movieLikesDislikes.likedOrDislikedUser = userLikeOrDislike;
 
     res.status(200).json(movieLikesDislikes);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.getMoviesGenre = async (req, res, next) => {
+  try {
+    const movieId = req.params.movieId;
+    const movie = await Movie.findById(movieId);
+
+    const movies = await Movie.find({ genre: movie.genre }).limit(10);
+
+    res.status(200).json(movies);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.getMoviesPopular = async (req, res, next) => {
+  try {
+    const likesMovie = await Like.aggregate([
+      {
+        $lookup: {
+          from: "movies",
+          localField: "movie",
+          foreignField: "_id",
+          as: "movieObject",
+        },
+      },
+      {
+        $match: {
+          like: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$movie",
+          movie: { $first: "$movieObject" },
+          numberLikes: { $sum: 1 },
+        },
+      },
+      { $sort: { numberLikes: -1 } },
+      { $project: { "movie.title": 1 } },
+    ]);
+
+    res.status(200).json(likesMovie);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
