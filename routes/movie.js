@@ -11,6 +11,8 @@ router.post("/", isAuth, movieController.createMovie);
 
 router.get("/:movieId/movies-genre", isAuth, movieController.getMoviesGenre);
 
+router.put("/:movieId/visits", isAuth, movieController.setMovieVisits);
+
 router.get("/movies-popular", isAuth, movieController.getMoviesPopular);
 
 router.get("/:movieId", isAuth, movieController.getMovie);

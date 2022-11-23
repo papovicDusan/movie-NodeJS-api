@@ -31,6 +31,10 @@ const movieSchema = new Schema(
         ref: "Like",
       },
     ],
+    visits: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

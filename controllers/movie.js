@@ -217,3 +217,18 @@ exports.getMoviesPopular = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.setMovieVisits = async (req, res, next) => {
+  try {
+    const movieId = req.params.movieId;
+    const movie = await Movie.findById(movieId);
+    movie.visits = movie.visits + 1;
+    await movie.save();
+    res.status(200).json(movie);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
