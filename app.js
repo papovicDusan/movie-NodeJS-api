@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth");
 const movieRoutes = require("./routes/movie");
 const commentRoutes = require("./routes/comment");
 const likeRoutes = require("./routes/like");
+const watchlistRoutes = require("./routes/watchlist");
 
 const app = express();
 
@@ -26,10 +27,11 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/auth", authRoutes);
+app.use("/", authRoutes);
 app.use("/movies", movieRoutes);
 app.use("/comments", commentRoutes);
 app.use("/likes", likeRoutes);
+app.use("/watchlists", watchlistRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);

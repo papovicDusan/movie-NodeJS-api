@@ -1,7 +1,6 @@
 const Movie = require("../models/movie");
 const Like = require("../models/like");
 var mongoose = require("mongoose");
-const like = require("../models/like");
 
 exports.getMovies = async (req, res, next) => {
   try {

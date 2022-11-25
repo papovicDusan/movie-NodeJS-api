@@ -20,6 +20,12 @@ const userSchema = new Schema({
       ref: "Like",
     },
   ],
+  watchlists: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Watchlist",
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);
