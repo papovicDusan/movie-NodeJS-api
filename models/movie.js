@@ -31,6 +31,16 @@ const movieSchema = new Schema(
         ref: "Like",
       },
     ],
+    visits: {
+      type: Number,
+      default: 0,
+    },
+    watchlists: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Watchlist",
+      },
+    ],
   },
   { timestamps: true }
 );

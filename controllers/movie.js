@@ -1,7 +1,6 @@
 const Movie = require("../models/movie");
 const Like = require("../models/like");
 var mongoose = require("mongoose");
-const like = require("../models/like");
 
 exports.getMovies = async (req, res, next) => {
   try {
@@ -210,6 +209,21 @@ exports.getMoviesPopular = async (req, res, next) => {
     ]);
 
     res.status(200).json(likesMovie);
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.setMovieVisits = async (req, res, next) => {
+  try {
+    const movieId = req.params.movieId;
+    const movie = await Movie.findById(movieId);
+    movie.visits = movie.visits + 1;
+    await movie.save();
+    res.status(200).json(movie);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

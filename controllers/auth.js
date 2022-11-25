@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
+var mongoose = require("mongoose");
 
 exports.signup = async (req, res, next) => {
   try {
@@ -59,6 +60,43 @@ exports.login = async (req, res, next) => {
       { expiresIn: "1h" }
     );
     res.status(200).json({ access: token, userId: user._id.toString() });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.getUser = async (req, res, next) => {
+  try {
+    const userArray = await User.aggregate([
+      {
+        $lookup: {
+          from: "watchlists",
+          localField: "watchlists",
+          foreignField: "_id",
+          as: "watchlistsArray",
+        },
+      },
+      {
+        $lookup: {
+          from: "movies",
+          localField: "watchlistsArray.movie",
+          foreignField: "_id",
+          as: "moviesArray",
+        },
+      },
+
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(req.userId),
+        },
+      },
+    ]);
+    const user = userArray[0];
+
+    res.status(200).json(user);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
