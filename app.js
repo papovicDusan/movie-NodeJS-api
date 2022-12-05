@@ -31,9 +31,9 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRoutes);
+app.use("/movies", commentRoutes);
 app.use("/movies", movieRoutes);
-app.use("/comments", commentRoutes);
-app.use("/likes", likeRoutes);
+app.use("/movies", likeRoutes);
 app.use("/watchlists", watchlistRoutes);
 
 app.use((error, req, res, next) => {

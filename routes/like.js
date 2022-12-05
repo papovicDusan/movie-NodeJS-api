@@ -5,8 +5,8 @@ const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 
-router.post("/", isAuth, likeController.createLike);
+router.post("/:movieId/likes", isAuth, likeController.createLike);
 
-router.delete("/movies/:movieId", isAuth, likeController.deleteLike);
+router.delete("/:movieId/likes", isAuth, likeController.deleteLike);
 
 module.exports = router;
