@@ -41,10 +41,10 @@ exports.login = async (email, password) => {
 
   const token = jwt.sign(
     {
-      email: user.email,
+      // email: user.email,
       userId: user._id.toString(),
     },
-    process.env.SECRET,
+    process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
   return { access: token, userId: user._id.toString() };
