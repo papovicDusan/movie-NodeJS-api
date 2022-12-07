@@ -9,7 +9,7 @@ router.get("/", isAuth, movieController.getMovies);
 
 router.post("/", isAuth, movieController.createMovie);
 
-router.get("/:movieId/movies-genre", isAuth, movieController.getMoviesGenre);
+router.get("/:movieId/related-movies", isAuth, movieController.getMoviesGenre);
 
 router.put("/:movieId/visits", isAuth, movieController.setMovieVisits);
 
