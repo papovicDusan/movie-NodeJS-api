@@ -1,13 +1,20 @@
 const authService = require("../services/auth");
 
 exports.signup = async (req, res, next) => {
-  const email = req.body.email;
-  const name = req.body.name;
-  const password = req.body.password;
+  try {
+    const email = req.body.email;
+    const name = req.body.name;
+    const password = req.body.password;
 
-  const user = await authService.signup(email, name, password);
+    const user = await authService.signup(email, name, password);
 
-  res.status(201).json({ message: "User created!", userId: user._id });
+    res.status(201).json({ message: "User created!", userId: user._id });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
 exports.login = async (req, res, next) => {

@@ -1,14 +1,20 @@
-const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const cors = require("cors");
+import express from "express";
+import config from "../config";
+import log from "./logger";
+import connect from "./db/connect";
 
-const authRoutes = require("./routes/auth");
-const movieRoutes = require("./routes/movie");
-const commentRoutes = require("./routes/comment");
-const likeRoutes = require("./routes/like");
-const watchlistRoutes = require("./routes/watchlist");
+import path from "path";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import cors from "cors";
+
+import authRoutes from "./routes/auth";
+import movieRoutes from "./routes/movie";
+import likeRoutes from "./routes/like";
+import commentRoutes from "./routes/comment";
+import watchlistRoutes from "./routes/watchlist";
+
+import "dotenv/config";
 
 const app = express();
 
@@ -26,21 +32,19 @@ app.use((req, res, next) => {
 
 app.use(cors());
 
-app.use(express.static(path.join(__dirname, "public")));
-
 app.use("/", authRoutes);
 app.use("/movies", commentRoutes);
 app.use("/movies", movieRoutes);
 app.use("/movies", likeRoutes);
 app.use("/watchlists", watchlistRoutes);
 
-app.use((error, req, res, next) => {
-  console.log(error);
-  const status = error.statusCode || 500;
-  const message = error.message;
-  const data = error.data;
-  res.status(status).json({ message: message, data: data });
-});
+// app.use((error, req, res, next) => {
+//   console.log(error);
+//   const status = error.statusCode || 500;
+//   const message = error.message;
+//   const data = error.data;
+//   res.status(status).json({ message: message, data: data });
+// });
 
 mongoose
   .connect(
@@ -51,4 +55,4 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-module.exports = app;
+export default app;

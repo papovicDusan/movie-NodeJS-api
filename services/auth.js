@@ -44,7 +44,7 @@ exports.login = async (email, password) => {
       // email: user.email,
       userId: user._id.toString(),
     },
-    process.env.JWT_SECRET,
+    config.JWT_SECRET,
     { expiresIn: "1h" }
   );
   return { access: token, userId: user._id.toString() };
