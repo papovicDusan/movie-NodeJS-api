@@ -1,6 +1,7 @@
 import Like, { ILike, BaseLike } from "../models/like";
 import Movie, { IMovie } from "../models/movie";
 import User, { IUser } from "../models/user";
+import { AppError } from "../utils/app-error";
 
 const createLike = async (dataLike: BaseLike): Promise<ILike> => {
   const newLike: ILike = new Like({
@@ -13,8 +14,7 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
   const movie: IMovie | null = await Movie.findById(dataLike.movie);
 
   if (!movie) {
-    const error: any = new Error("Could not find movie.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find movie.", 404);
     throw error;
   }
   movie.likes.push(like._id);
@@ -22,8 +22,7 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
 
   const user: IUser | null = await User.findById(dataLike.user);
   if (!user) {
-    const error: any = new Error("Could not find user.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find user.", 404);
     throw error;
   }
   user.likes.push(like._id);
@@ -38,8 +37,7 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
     movie: movieId,
   });
   if (!like) {
-    const error: any = new Error("Could not find like.");
-    error.statusCode = 404;
+    const error: AppError = new AppError("Could not find like.", 404);
     throw error;
   }
 
@@ -47,8 +45,7 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
 
   const user: IUser | null = await User.findById(userId);
   if (!user) {
-    const error: any = new Error("Could not find user.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find user.", 404);
     throw error;
   }
 
@@ -59,8 +56,7 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
 
   const movie: IMovie | null = await Movie.findById(movieId);
   if (!movie) {
-    const error: any = new Error("Could not find movie.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find movie.", 404);
     throw error;
   }
   movie.likes = movie.likes.filter(

@@ -10,6 +10,7 @@ import Movie, {
 } from "../models/movie";
 import mongoose from "mongoose";
 import { ParsedQs } from "qs";
+import { AppError } from "../utils/app-error";
 
 const getMovies = async (
   page: number,
@@ -173,8 +174,7 @@ const getMovie = async (
 const getMoviesGenre = async (movieId: string): Promise<IMovie[]> => {
   const movie: IMovie | null = await Movie.findById(movieId);
   if (!movie) {
-    const error: any = new Error("Could not find movie.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find movie.", 404);
     throw error;
   }
   const movies = await Movie.find({
@@ -216,8 +216,7 @@ const getMoviesPopular = async (): Promise<IMoviePopular[]> => {
 const setMovieVisits = async (movieId: string): Promise<IMovie> => {
   const movie: IMovie | null = await Movie.findById(movieId);
   if (!movie) {
-    const error: any = new Error("Could not find movie.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find movie.", 404);
     throw error;
   }
   movie.visits = movie.visits + 1;

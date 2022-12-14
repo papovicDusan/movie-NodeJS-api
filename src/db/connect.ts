@@ -1,19 +1,13 @@
 import mongoose from "mongoose";
 import config from "../../config";
-import log from "../logger";
 
-function connect() {
-  return mongoose
+export const connect = (app: any) => {
+  mongoose
     .connect(
       `mongodb+srv://${config.DB_USERNAME}:${config.DB_PASSWORD}@clusternodejs.wid3nbe.mongodb.net/movie?retryWrites=true&w=majority`
     )
     .then((result) => {
-      log.info("Database connected");
+      app.listen(8080);
     })
-    .catch((err) => {
-      log.error("db error", err);
-      process.exit(1);
-    });
-}
-
-export default connect;
+    .catch((err) => console.log(err));
+};

@@ -5,6 +5,7 @@ import Comment, {
   emptyCommentPaginate,
 } from "../models/comment";
 import Movie, { IMovie } from "../models/movie";
+import { AppError } from "../utils/app-error";
 
 const createComment = async (dataComment: BaseComment): Promise<IComment> => {
   const commentNew: IComment = new Comment({
@@ -14,10 +15,12 @@ const createComment = async (dataComment: BaseComment): Promise<IComment> => {
   const comment: IComment = await commentNew.save();
 
   const movie: IMovie | null = await Movie.findById(dataComment.movie);
-  if (movie) {
-    movie.comments.push(comment._id);
-    await movie.save();
+  if (!movie) {
+    const error: AppError = new AppError("Could not find movie.", 404);
+    throw error;
   }
+  movie.comments.push(comment._id);
+  await movie.save();
 
   return comment;
 };
@@ -36,8 +39,7 @@ const getComments = async (
   );
 
   if (!movie) {
-    const error: any = new Error("Could not find movie.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Could not find movie.", 404);
     throw error;
   }
 

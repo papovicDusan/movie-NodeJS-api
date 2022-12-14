@@ -1,19 +1,32 @@
 import isAuth from "../middleware/is-auth";
 import express from "express";
 import movieController from "../controllers/movie";
+import { tryCatch } from "../utils/try-catch";
 
 const router = express.Router();
 
-router.get("/", isAuth, movieController.getMovies);
+router.get("/", isAuth, tryCatch(movieController.getMovies));
 
-router.post("/", isAuth, movieController.createMovie);
+router.post("/", isAuth, tryCatch(movieController.createMovie));
 
-router.get("/:movieId/related-movies", isAuth, movieController.getMoviesGenre);
+router.get(
+  "/:movieId/related-movies",
+  isAuth,
+  tryCatch(movieController.getMoviesGenre)
+);
 
-router.put("/:movieId/visits", isAuth, movieController.setMovieVisits);
+router.put(
+  "/:movieId/visits",
+  isAuth,
+  tryCatch(movieController.setMovieVisits)
+);
 
-router.get("/movies-popular", isAuth, movieController.getMoviesPopular);
+router.get(
+  "/movies-popular",
+  isAuth,
+  tryCatch(movieController.getMoviesPopular)
+);
 
-router.get("/:movieId", isAuth, movieController.getMovie);
+router.get("/:movieId", isAuth, tryCatch(movieController.getMovie));
 
 export default router;

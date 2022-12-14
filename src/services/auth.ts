@@ -3,14 +3,14 @@ import jwt from "jsonwebtoken";
 import User, { IUser, BaseUser, IUserMovieWatchlist } from "../models/user";
 import mongoose from "mongoose";
 import config from "../../config";
+import { AppError } from "../utils/app-error";
 
 const signup = async (userData: BaseUser): Promise<IUser> => {
   const userExists: IUser | null = await User.findOne({
     email: userData.email,
   });
   if (userExists) {
-    const error: any = new Error("A user with this email exist.");
-    error.statusCode = 400;
+    const error: AppError = new AppError("A user with this email exist.", 404);
     throw error;
   }
 
@@ -32,15 +32,16 @@ const login = async (
 ): Promise<{ access: string; userId: string }> => {
   const user: IUser | null = await User.findOne({ email: email });
   if (!user) {
-    const error: any = new Error("A user with this email could not be found.");
-    error.statusCode = 400;
+    const error: AppError = new AppError(
+      "A user with this email could not be found.",
+      400
+    );
     throw error;
   }
 
   const isEqual = await bcrypt.compare(password, user.password);
   if (!isEqual) {
-    const error: any = new Error("Wrong password!");
-    error.statusCode = 400;
+    const error: AppError = new AppError("Wrong password!", 400);
     throw error;
   }
 
