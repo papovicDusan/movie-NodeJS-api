@@ -25,7 +25,12 @@ const createComment = async (dataComment: BaseComment): Promise<IComment> => {
   });
   const comment: IComment = await commentNew.save();
 
-  const movie: IMovie | null = await Movie.findById(dataComment.movie);
+  const movie: IMovie | null = await Movie.findOneAndUpdate(
+    { _id: dataComment.movie },
+    { $push: { comments: comment._id } },
+    { new: true }
+  );
+
   if (!movie) {
     const error: AppError = new AppError(
       "Could not find movie.",
@@ -33,8 +38,6 @@ const createComment = async (dataComment: BaseComment): Promise<IComment> => {
     );
     throw error;
   }
-  movie.comments.push(comment._id);
-  await movie.save();
 
   return comment;
 };

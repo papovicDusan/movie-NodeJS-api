@@ -12,7 +12,11 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
   });
   const like: ILike = await newLike.save();
 
-  const movie: IMovie | null = await Movie.findById(dataLike.movie);
+  const movie: IMovie | null = await Movie.findOneAndUpdate(
+    { _id: dataLike.movie },
+    { $push: { likes: like._id } },
+    { new: true }
+  );
 
   if (!movie) {
     const error: AppError = new AppError(
@@ -21,10 +25,13 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
     );
     throw error;
   }
-  movie.likes.push(like._id);
-  await movie.save();
 
-  const user: IUser | null = await User.findById(dataLike.user);
+  const user: IUser | null = await User.findOneAndUpdate(
+    { _id: dataLike.user },
+    { $push: { likes: like._id } },
+    { new: true }
+  );
+
   if (!user) {
     const error: AppError = new AppError(
       "Could not find user.",
@@ -32,8 +39,6 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
     );
     throw error;
   }
-  user.likes.push(like._id);
-  await user.save();
 
   return like;
 };
@@ -53,7 +58,12 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
 
   const deletedLike = await Like.deleteOne({ _id: like._id });
 
-  const user: IUser | null = await User.findById(userId);
+  const user: IUser | null = await User.findOneAndUpdate(
+    { _id: userId },
+    { $pull: { likes: like._id } },
+    { new: true }
+  );
+
   if (!user) {
     const error: AppError = new AppError(
       "Could not find user.",
@@ -62,12 +72,12 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
     throw error;
   }
 
-  user.likes = user.likes.filter(
-    (likeItem: any) => likeItem.toString() != like._id.toString()
+  const movie: IMovie | null = await Movie.findOneAndUpdate(
+    { _id: movieId },
+    { $pull: { likes: like._id } },
+    { new: true }
   );
-  await user.save();
 
-  const movie: IMovie | null = await Movie.findById(movieId);
   if (!movie) {
     const error: AppError = new AppError(
       "Could not find movie.",
@@ -75,10 +85,6 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
     );
     throw error;
   }
-  movie.likes = movie.likes.filter(
-    (likeItem: any) => likeItem.toString() != like._id.toString()
-  );
-  await movie.save();
 
   return deletedLike.deletedCount;
 };

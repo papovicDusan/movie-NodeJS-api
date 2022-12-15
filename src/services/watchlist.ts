@@ -13,7 +13,11 @@ const createWatchlist = async (
   });
   const watchlist: IWatchlist = await newWatchlist.save();
 
-  const movie: IMovie | null = await Movie.findById(dataWatchlist.movie);
+  const movie: IMovie | null = await Movie.findOneAndUpdate(
+    { _id: dataWatchlist.movie },
+    { $push: { watchlists: watchlist._id } },
+    { new: true }
+  );
   if (!movie) {
     const error: AppError = new AppError(
       "Could not find movie.",
@@ -21,10 +25,12 @@ const createWatchlist = async (
     );
     throw error;
   }
-  movie.watchlists.push(watchlist._id);
-  await movie.save();
 
-  const user: IUser | null = await User.findById(dataWatchlist.user);
+  const user: IUser | null = await User.findOneAndUpdate(
+    { _id: dataWatchlist.user },
+    { $push: { watchlists: watchlist._id } },
+    { new: true }
+  );
   if (!user) {
     const error: AppError = new AppError(
       "Could not find user.",
@@ -32,8 +38,6 @@ const createWatchlist = async (
     );
     throw error;
   }
-  user.watchlists.push(watchlist._id);
-  await user.save();
 
   return watchlist;
 };
@@ -51,7 +55,12 @@ const deleteWatchlist = async (
     throw error;
   }
 
-  const user: IUser | null = await User.findById(userId);
+  const user: IUser | null = await User.findOneAndUpdate(
+    { _id: userId },
+    { $pull: { watchlists: watchlist._id } },
+    { new: true }
+  );
+
   if (!user) {
     const error: AppError = new AppError(
       "Could not find user.",
@@ -59,12 +68,12 @@ const deleteWatchlist = async (
     );
     throw error;
   }
-  user.watchlists = user.watchlists.filter(
-    (watchlistItem: any) => watchlistItem.toString() != watchlist._id.toString()
-  );
-  await user.save();
 
-  const movie: IMovie | null = await Movie.findById(watchlist.movie);
+  const movie: IMovie | null = await Movie.findOneAndUpdate(
+    { _id: watchlist.movie },
+    { $pull: { watchlists: watchlist._id } },
+    { new: true }
+  );
 
   if (!movie) {
     const error: AppError = new AppError(
@@ -73,10 +82,6 @@ const deleteWatchlist = async (
     );
     throw error;
   }
-  movie.watchlists = movie.watchlists.filter(
-    (watchlistItem: any) => watchlistItem.toString() != watchlist._id.toString()
-  );
-  await movie.save();
 
   const deletedWatchlst: IWatchlist = await watchlist.remove();
 
