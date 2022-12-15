@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, ErrorRequestHandler } from "express";
 import { AppError } from "../utils/app-error";
+import { StatusCodes } from "http-status-codes";
 
 export const errorHandler = (
   error: ErrorRequestHandler,
@@ -15,5 +16,7 @@ export const errorHandler = (
     });
   }
 
-  return res.status(500).json({ message: "Something went wrong" });
+  return res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ message: "Something went wrong" });
 };

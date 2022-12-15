@@ -2,6 +2,7 @@ import Watchlist, { IWatchlist, BaseWatchlist } from "../models/watchlist";
 import Movie, { IMovie } from "../models/movie";
 import User, { IUser } from "../models/user";
 import { AppError } from "../utils/app-error";
+import { StatusCodes } from "http-status-codes";
 
 const createWatchlist = async (
   dataWatchlist: BaseWatchlist
@@ -14,7 +15,10 @@ const createWatchlist = async (
 
   const movie: IMovie | null = await Movie.findById(dataWatchlist.movie);
   if (!movie) {
-    const error: AppError = new AppError("Could not find movie.", 404);
+    const error: AppError = new AppError(
+      "Could not find movie.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   movie.watchlists.push(watchlist._id);
@@ -22,7 +26,10 @@ const createWatchlist = async (
 
   const user: IUser | null = await User.findById(dataWatchlist.user);
   if (!user) {
-    const error: AppError = new AppError("Could not find user.", 404);
+    const error: AppError = new AppError(
+      "Could not find user.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   user.watchlists.push(watchlist._id);
@@ -37,13 +44,19 @@ const deleteWatchlist = async (
 ): Promise<IWatchlist> => {
   const watchlist: IWatchlist | null = await Watchlist.findById(watchlistId);
   if (!watchlist) {
-    const error: AppError = new AppError("Could not find watchlist.", 404);
+    const error: AppError = new AppError(
+      "Could not find watchlist.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
 
   const user: IUser | null = await User.findById(userId);
   if (!user) {
-    const error: AppError = new AppError("Could not find user.", 404);
+    const error: AppError = new AppError(
+      "Could not find user.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   user.watchlists = user.watchlists.filter(
@@ -54,7 +67,10 @@ const deleteWatchlist = async (
   const movie: IMovie | null = await Movie.findById(watchlist.movie);
 
   if (!movie) {
-    const error: AppError = new AppError("Could not find movie.", 404);
+    const error: AppError = new AppError(
+      "Could not find movie.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   movie.watchlists = movie.watchlists.filter(
@@ -73,7 +89,10 @@ const setWatchlistWatched = async (
 ): Promise<IWatchlist> => {
   const watchlist: IWatchlist | null = await Watchlist.findById(watchlistId);
   if (!watchlist) {
-    const error: AppError = new AppError("Could not find  watchlist.", 404);
+    const error: AppError = new AppError(
+      "Could not find  watchlist.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   watchlist.is_watched = isWatched;

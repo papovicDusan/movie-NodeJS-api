@@ -11,6 +11,8 @@ import Movie, {
 import mongoose from "mongoose";
 import { ParsedQs } from "qs";
 import { AppError } from "../utils/app-error";
+import { StatusCodes } from "http-status-codes";
+import { validateMovieData } from "../utils/validations";
 
 const getMovies = async (
   page: number,
@@ -94,6 +96,15 @@ const getMovies = async (
 };
 
 const createMovie = async (dataMovie: BaseMovie): Promise<IMovie> => {
+  const valid = validateMovieData(dataMovie);
+  if (valid.error) {
+    const error: AppError = new AppError(
+      valid.error.message,
+      StatusCodes.BAD_REQUEST
+    );
+    throw error;
+  }
+
   const movieNew: IMovie = new Movie({
     title: dataMovie.title,
     description: dataMovie.description,
@@ -116,8 +127,10 @@ const getMovie = async (
   const movie: any = await Movie.findById(movieId);
 
   if (!movie) {
-    const error: any = new Error("Could not find movie.");
-    error.statusCode = 404;
+    const error: AppError = new AppError(
+      "Could not find movie.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
 
@@ -174,7 +187,10 @@ const getMovie = async (
 const getMoviesGenre = async (movieId: string): Promise<IMovie[]> => {
   const movie: IMovie | null = await Movie.findById(movieId);
   if (!movie) {
-    const error: AppError = new AppError("Could not find movie.", 404);
+    const error: AppError = new AppError(
+      "Could not find movie.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   const movies = await Movie.find({
@@ -216,7 +232,10 @@ const getMoviesPopular = async (): Promise<IMoviePopular[]> => {
 const setMovieVisits = async (movieId: string): Promise<IMovie> => {
   const movie: IMovie | null = await Movie.findById(movieId);
   if (!movie) {
-    const error: AppError = new AppError("Could not find movie.", 404);
+    const error: AppError = new AppError(
+      "Could not find movie.",
+      StatusCodes.NOT_FOUND
+    );
     throw error;
   }
   movie.visits = movie.visits + 1;

@@ -1,6 +1,6 @@
 import movieService from "../services/movie";
 import { NextFunction, Request, Response } from "express";
-import Movie, {
+import {
   IMovie,
   BaseMovie,
   IMovieLikesDislikes,

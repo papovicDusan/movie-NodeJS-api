@@ -4,13 +4,27 @@ import User, { IUser, BaseUser, IUserMovieWatchlist } from "../models/user";
 import mongoose from "mongoose";
 import config from "../../config";
 import { AppError } from "../utils/app-error";
+import { StatusCodes } from "http-status-codes";
+import { validateUserData, validateLoginData } from "../utils/validations";
 
 const signup = async (userData: BaseUser): Promise<IUser> => {
+  const valid = validateUserData(userData);
+  if (valid.error) {
+    const error: AppError = new AppError(
+      valid.error.message,
+      StatusCodes.BAD_REQUEST
+    );
+    throw error;
+  }
+
   const userExists: IUser | null = await User.findOne({
     email: userData.email,
   });
   if (userExists) {
-    const error: AppError = new AppError("A user with this email exist.", 404);
+    const error: AppError = new AppError(
+      `A user with email ${userData.email} exist.`,
+      StatusCodes.BAD_REQUEST
+    );
     throw error;
   }
 
@@ -30,18 +44,30 @@ const login = async (
   email: string,
   password: string
 ): Promise<{ access: string; userId: string }> => {
+  const valid = validateLoginData({ email, password });
+  if (valid.error) {
+    const error: AppError = new AppError(
+      valid.error.message,
+      StatusCodes.BAD_REQUEST
+    );
+    throw error;
+  }
+
   const user: IUser | null = await User.findOne({ email: email });
   if (!user) {
     const error: AppError = new AppError(
-      "A user with this email could not be found.",
-      400
+      `A user with email ${email} could not be found.`,
+      StatusCodes.BAD_REQUEST
     );
     throw error;
   }
 
   const isEqual = await bcrypt.compare(password, user.password);
   if (!isEqual) {
-    const error: AppError = new AppError("Wrong password!", 400);
+    const error: AppError = new AppError(
+      "Wrong password!",
+      StatusCodes.BAD_REQUEST
+    );
     throw error;
   }
 
