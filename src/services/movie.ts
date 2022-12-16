@@ -6,7 +6,6 @@ import Movie, {
   IMovieLikesDislikesUser,
   IMoviePaginate,
   IMoviePopular,
-  emptyMoviesPaginate,
 } from "../models/movie";
 import mongoose from "mongoose";
 import { ParsedQs } from "qs";
@@ -20,7 +19,6 @@ const getMovies = async (
   search: string | ParsedQs | string[] | ParsedQs[],
   genre: string | ParsedQs | string[] | ParsedQs[]
 ): Promise<IMoviePaginate> => {
-  const moviesPaginate: IMoviePaginate = emptyMoviesPaginate;
   const query: any = {};
 
   if (search) {
@@ -30,25 +28,10 @@ const getMovies = async (
     query.genre = genre;
   }
 
-  const startIndex: number = (page - 1) * limit;
-  const endIndex: number = page * limit;
-
-  const moviesNumber: number = await Movie.find(query).countDocuments();
-
-  moviesPaginate.count = moviesNumber;
-  endIndex < moviesNumber
-    ? (moviesPaginate.next = page + 1)
-    : (moviesPaginate.next = null);
-  startIndex > 0
-    ? (moviesPaginate.previous = page - 1)
-    : (moviesPaginate.previous = null);
-
-  const movies: IMovie[] = await Movie.find(query)
-    .skip(startIndex)
-    .limit(limit);
+  const movies: any = await Movie.paginate({}, { page: page, limit: limit });
 
   const moviesLikesDislikes: IMovieLikesDislikes[] = await Promise.all(
-    movies.map(async (movie: any) => {
+    movies.docs.map(async (movie: any) => {
       let likes: number = 0;
       let dislikes: number = 0;
       let movieLikesDislikes: IMovieLikesDislikes = {
@@ -91,8 +74,9 @@ const getMovies = async (
     })
   );
 
-  moviesPaginate.results = moviesLikesDislikes;
-  return moviesPaginate;
+  movies.docs = moviesLikesDislikes;
+
+  return movies;
 };
 
 const createMovie = async (dataMovie: BaseMovie): Promise<IMovie> => {

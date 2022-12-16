@@ -2,7 +2,6 @@ import Comment, {
   IComment,
   BaseComment,
   ICommentPaginate,
-  emptyCommentPaginate,
 } from "../models/comment";
 import Movie, { IMovie } from "../models/movie";
 import { AppError } from "../utils/app-error";
@@ -47,36 +46,12 @@ const getComments = async (
   page: any,
   limit: number
 ): Promise<ICommentPaginate> => {
-  const commentPaginate: ICommentPaginate = emptyCommentPaginate;
-  const startIndex: number = (page - 1) * limit;
-  const endIndex: number = page * limit;
-
-  const movie: IMovie | null = await Movie.findById(movieId).populate(
-    "comments"
+  const comments: any = await Comment.paginate(
+    { movie: movieId },
+    { page: page, limit: limit }
   );
 
-  if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
-    throw error;
-  }
-
-  commentPaginate.count = movie.comments.length;
-
-  endIndex < movie.comments.length
-    ? (commentPaginate.next = page + 1)
-    : (commentPaginate.next = null);
-  startIndex > 0
-    ? (commentPaginate.previous = page - 1)
-    : (commentPaginate.previous = null);
-
-  commentPaginate.results = movie.comments.slice(
-    startIndex,
-    startIndex + limit
-  );
-  return commentPaginate;
+  return comments;
 };
 
 export default { createComment, getComments };

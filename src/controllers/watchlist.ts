@@ -1,13 +1,9 @@
 import watchlistService from "../services/watchlist";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { BaseWatchlist, IWatchlist } from "../models/watchlist";
 import { StatusCodes } from "http-status-codes";
 
-const createWatchlist = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const createWatchlist = async (req: Request, res: Response) => {
   const watchlistData: BaseWatchlist = {
     movie: req.body.movie,
     user: req.body.userId,
@@ -20,11 +16,7 @@ const createWatchlist = async (
   res.status(StatusCodes.CREATED).json(watchlist);
 };
 
-const deleteWatchlist = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const deleteWatchlist = async (req: Request, res: Response) => {
   const watchlistId: string = req.params.watchlistId;
   const userId: string = req.body.userId;
 
@@ -38,11 +30,7 @@ const deleteWatchlist = async (
     .json({ message: "Deleted watchlist.", watchlist: watchlist });
 };
 
-const setWatchlistWatched = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const setWatchlistWatched = async (req: Request, res: Response) => {
   const watchlistId: string = req.params.watchlistId;
   const isWatched: boolean = req.body.is_watched;
 

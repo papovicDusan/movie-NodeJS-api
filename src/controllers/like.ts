@@ -1,9 +1,9 @@
 import likeService from "../services/like";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { BaseLike, ILike } from "../models/like";
 import { StatusCodes } from "http-status-codes";
 
-const createLike = async (req: Request, res: Response, next: NextFunction) => {
+const createLike = async (req: Request, res: Response) => {
   const likeData: BaseLike = {
     like: req.body.like,
     movie: req.body.movie_id,
@@ -15,7 +15,7 @@ const createLike = async (req: Request, res: Response, next: NextFunction) => {
   res.status(StatusCodes.CREATED).json(like);
 };
 
-const deleteLike = async (req: Request, res: Response, next: NextFunction) => {
+const deleteLike = async (req: Request, res: Response) => {
   const movieId: string = req.params.movieId;
   const userId: string = req.body.userId;
 

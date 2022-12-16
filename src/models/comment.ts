@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
 export interface BaseComment {
   content: string;
@@ -13,18 +14,11 @@ export interface IComment extends mongoose.Document {
 }
 
 export interface ICommentPaginate {
-  count: number;
-  next: number | null;
-  previous: number | null;
-  results: IComment[];
+  docs: IComment[];
+  nextPage: number | null;
+  prevPage: number | null;
+  totalDocs: number;
 }
-
-export const emptyCommentPaginate: ICommentPaginate = {
-  count: 0,
-  next: null,
-  previous: null,
-  results: [],
-};
 
 const commentSchema = new Schema(
   {
@@ -41,6 +35,10 @@ const commentSchema = new Schema(
   { timestamps: true }
 );
 
-const Comment = mongoose.model<IComment>("Comment", commentSchema);
+commentSchema.plugin(paginate);
+const Comment = mongoose.model<IComment, mongoose.PaginateModel<IComment>>(
+  "Comment",
+  commentSchema
+);
 
 export default Comment;

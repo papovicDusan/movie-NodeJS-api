@@ -1,9 +1,9 @@
 import authService from "../services/auth";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { BaseUser, IUser, IUserMovieWatchlist } from "../models/user";
 import { StatusCodes } from "http-status-codes";
 
-const signup = async (req: Request, res: Response, next: NextFunction) => {
+const signup = async (req: Request, res: Response) => {
   const userData: BaseUser = req.body;
 
   const user: IUser = await authService.signup(userData);
@@ -13,7 +13,7 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     .json({ message: "User created!", userId: user._id });
 };
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
+const login = async (req: Request, res: Response) => {
   const email: string = req.body.email;
   const password: string = req.body.password;
 
@@ -23,7 +23,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   res.status(StatusCodes.OK).json({ access: access, userId: userId });
 };
 
-const getUser = async (req: Request, res: Response, next: NextFunction) => {
+const getUser = async (req: Request, res: Response) => {
   const userId: string = req.body.userId;
 
   const user: IUserMovieWatchlist = await authService.getUser(userId);

@@ -1,9 +1,8 @@
 import movieService from "../services/movie";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import {
   IMovie,
   BaseMovie,
-  IMovieLikesDislikes,
   IMovieLikesDislikesUser,
   IMoviePaginate,
   IMoviePopular,
@@ -11,7 +10,7 @@ import {
 import { ParsedQs } from "qs";
 import { StatusCodes } from "http-status-codes";
 
-const getMovies = async (req: Request, res: Response, next: NextFunction) => {
+const getMovies = async (req: Request, res: Response) => {
   const page: number = Number(req.query.page) || 1;
   const limit: number = 2;
 
@@ -30,7 +29,7 @@ const getMovies = async (req: Request, res: Response, next: NextFunction) => {
   res.status(StatusCodes.OK).json(movies);
 };
 
-const createMovie = async (req: Request, res: Response, next: NextFunction) => {
+const createMovie = async (req: Request, res: Response) => {
   const movieData: BaseMovie = {
     title: req.body.title,
     description: req.body.description,
@@ -43,7 +42,7 @@ const createMovie = async (req: Request, res: Response, next: NextFunction) => {
   res.status(StatusCodes.CREATED).json(movie);
 };
 
-const getMovie = async (req: Request, res: Response, next: NextFunction) => {
+const getMovie = async (req: Request, res: Response) => {
   const movieId: string = req.params.movieId;
   const userId: string = req.body.userId;
 
@@ -55,11 +54,7 @@ const getMovie = async (req: Request, res: Response, next: NextFunction) => {
   res.status(StatusCodes.OK).json(movie);
 };
 
-const getMoviesGenre = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getMoviesGenre = async (req: Request, res: Response) => {
   const movieId: string = req.params.movieId;
 
   const movies: IMovie[] = await movieService.getMoviesGenre(movieId);
@@ -67,21 +62,13 @@ const getMoviesGenre = async (
   res.status(StatusCodes.OK).json(movies);
 };
 
-const getMoviesPopular = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getMoviesPopular = async (req: Request, res: Response) => {
   const movies: IMoviePopular[] = await movieService.getMoviesPopular();
 
   res.status(StatusCodes.OK).json(movies);
 };
 
-const setMovieVisits = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const setMovieVisits = async (req: Request, res: Response) => {
   const movieId: string = req.params.movieId;
 
   const movie: IMovie = await movieService.setMovieVisits(movieId);

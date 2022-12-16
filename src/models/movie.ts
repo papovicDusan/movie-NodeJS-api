@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { IComment } from "./comment";
+import paginate from "mongoose-paginate-v2";
 
 export interface BaseMovie {
   title: string;
@@ -13,8 +14,7 @@ export interface IMovie extends mongoose.Document {
   description: string;
   image_url: string;
   genre: string;
-  commentsId: string[];
-  comments: IComment[];
+  comments: string[];
   likes: string[];
   visits: number;
   watchlists: string[];
@@ -32,23 +32,16 @@ export interface IMovieLikesDislikesUser extends IMovieLikesDislikes {
 }
 
 export interface IMoviePaginate {
-  count: number;
-  next: number | null;
-  previous: number | null;
-  results: IMovieLikesDislikes[];
+  docs: IMovieLikesDislikes[];
+  nextPage: number | null;
+  prevPage: number | null;
+  totalDocs: number;
 }
 
 export interface IMoviePopular {
   _id: string;
   movie: { title: any }[];
 }
-
-export const emptyMoviesPaginate: IMoviePaginate = {
-  count: 0,
-  next: null,
-  previous: null,
-  results: [],
-};
 
 const movieSchema = new Schema(
   {
@@ -94,6 +87,10 @@ const movieSchema = new Schema(
   { timestamps: true }
 );
 
-const Movie = mongoose.model<IMovie>("Movie", movieSchema);
+movieSchema.plugin(paginate);
+const Movie = mongoose.model<IMovie, mongoose.PaginateModel<IMovie>>(
+  "Movie",
+  movieSchema
+);
 
 export default Movie;
