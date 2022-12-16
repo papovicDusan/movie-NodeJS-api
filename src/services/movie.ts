@@ -28,7 +28,7 @@ const getMovies = async (
     query.genre = genre;
   }
 
-  const movies: any = await Movie.paginate({}, { page: page, limit: limit });
+  const movies: any = await Movie.paginate(query, { page: page, limit: limit });
 
   const moviesLikesDislikes: IMovieLikesDislikes[] = await Promise.all(
     movies.docs.map(async (movie: any) => {

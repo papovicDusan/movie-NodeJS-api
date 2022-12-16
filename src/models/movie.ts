@@ -40,7 +40,7 @@ export interface IMoviePaginate {
 
 export interface IMoviePopular {
   _id: string;
-  movie: { title: any }[];
+  movie: { title: string }[];
 }
 
 const movieSchema = new Schema(

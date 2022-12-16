@@ -43,7 +43,7 @@ const createComment = async (dataComment: BaseComment): Promise<IComment> => {
 
 const getComments = async (
   movieId: string,
-  page: any,
+  page: number,
   limit: number
 ): Promise<ICommentPaginate> => {
   const comments: any = await Comment.paginate(

@@ -1,28 +1,34 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
+import { AppError } from "../utils/app-error";
+import { StatusCodes } from "http-status-codes";
 
 interface JwtPayload {
-  userId: any;
+  userId: string;
 }
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.get("Authorization");
   if (!authHeader) {
-    const error: any = new Error("Not authenticated.");
-    error.statusCode = 401;
+    const error: AppError = new AppError(
+      "Not authenticated.",
+      StatusCodes.UNAUTHORIZED
+    );
     throw error;
   }
+
   const token = authHeader.split(" ")[1];
   let decodedToken;
   try {
     decodedToken = jwt.verify(token, "somesupersecretsecret") as JwtPayload;
-  } catch (err: any) {
-    err.statusCode = 500;
-    throw err;
+  } catch (error) {
+    return next(error);
   }
   if (!decodedToken) {
-    const error: any = new Error("Not authenticated.");
-    error.statusCode = 401;
+    const error: AppError = new AppError(
+      "Not authenticated.",
+      StatusCodes.UNAUTHORIZED
+    );
     throw error;
   }
   req.body.userId = decodedToken.userId;
