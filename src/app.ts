@@ -12,6 +12,8 @@ import { errorHandler } from "./middleware/error-handler";
 import { setHeaderField } from "./middleware/set-header";
 import "dotenv/config";
 import { connect } from "./db/connect";
+import swaggerUi from "swagger-ui-express";
+import * as swaggerDocument from "./swagger.json";
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.use(setHeaderField);
 app.use(cors());
 
 app.use("/", authRoutes);
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/movies", commentRoutes);
 app.use("/movies", movieRoutes);
 app.use("/movies", likeRoutes);

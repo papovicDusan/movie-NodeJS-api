@@ -108,6 +108,14 @@ const getUser = async (userId: string): Promise<IUserMovieWatchlist> => {
   ]);
   const user: IUserMovieWatchlist = userArray[0];
 
+  if (!user) {
+    const error: AppError = new AppError(
+      "Could not find user.",
+      StatusCodes.NOT_FOUND
+    );
+    throw error;
+  }
+
   return user;
 };
 

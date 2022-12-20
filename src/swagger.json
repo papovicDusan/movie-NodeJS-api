@@ -1,0 +1,1062 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Movie-TypeScript-NodeJS-CRUD-REST-API",
+    "description": "Example of what you need to create a CRUD style API in NodeJs using TypeScript"
+  },
+  "host": "localhost:8080",
+
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API for User"
+    },
+    {
+      "name": "Comments",
+      "description": "API for Comment"
+    },
+    {
+      "name": "Likes",
+      "description": "API for Like"
+    },
+    {
+      "name": "Movies",
+      "description": "API for Movie"
+    },
+    {
+      "name": "Watchlists",
+      "description": "API for Watchlist"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user body",
+            "description": "Create user",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BaseUser"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Login user into the system",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "login body",
+            "description": "Login user into the system",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Users"],
+        "summary": "Get user",
+        "description": "Get auth user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UserMovieWatchlist"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/movies/{movieId}/comments": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Comments"],
+        "summary": "Get comments for movie",
+        "description": "Get comments for movie",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CommentPaginate"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Comments"],
+        "summary": "Create comment",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "comment body",
+            "description": "Create comment",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BaseComment"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Comment"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/movies/{movieId}/likes": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Likes"],
+        "summary": "Create like",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "like body",
+            "description": "Create like",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BaseLike"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Like"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Likes"],
+        "summary": "Delete like",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "like": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/movies": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Movies"],
+        "summary": "Get movies",
+        "description": "Get movies",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "",
+            "type": "string"
+          },
+          {
+            "name": "genre",
+            "in": "query",
+            "description": "",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MoviePaginate"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Movies"],
+        "summary": "Create movie",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "movie body",
+            "description": "Create movie",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BaseMovie"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Movie"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/movies/{movieId}/related-movies": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Movies"],
+        "summary": "Get related movies",
+        "description": "Get related movies",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Movie"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/movies/{movieId}/visits": {
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Movies"],
+        "summary": "Increase the number of visits to movie",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "schema": {
+              "$ref": "#/definitions/Movie"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+
+    "/movies/movies-popular": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Movies"],
+        "summary": "Get popular movies",
+        "description": "Get popular movies",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "movies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+
+    "/movies/{movieId}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Movies"],
+        "summary": "Get movie",
+        "description": "Get movie",
+        "parameters": [
+          {
+            "name": "movieId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MovieLikesDislikesUser"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/watchlists": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Watchlists"],
+        "summary": "Create watchlist",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "watchlist body",
+            "description": "Create watchlist",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BaseWatchlist"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Watchlist"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/watchlists/{watchlistId}": {
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Watchlists"],
+        "summary": "Delete watchlist",
+        "parameters": [
+          {
+            "name": "watchlistId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "watchlist": {
+                  "$ref": "#/definitions/Watchlist"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": ["Watchlists"],
+        "summary": "Put that the movie was watched",
+        "parameters": [
+          {
+            "name": "watchlistId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "watchlist body",
+            "description": "Put watchlist",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "is_watched": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "watchlist": {
+                  "$ref": "#/definitions/Watchlist"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BaseComment": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "movie_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "movie": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "__v": {
+          "type": "number"
+        }
+      }
+    },
+    "CommentPaginate": {
+      "type": "object",
+      "properties": {
+        "docs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Comment"
+          }
+        },
+        "nextPage": {
+          "type": "number"
+        },
+        "prevPage": {
+          "type": "number"
+        },
+        "totalDocs": {
+          "type": "number"
+        }
+      }
+    },
+    "BaseLike": {
+      "type": "object",
+      "properties": {
+        "like": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "movie_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Like": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "like": {
+          "type": "number"
+        },
+        "movie": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "__v": {
+          "type": "number"
+        }
+      }
+    },
+    "BaseMovie": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        }
+      }
+    },
+    "Movie": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visits": {
+          "type": "number"
+        },
+        "watchlists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "__v": {
+          "type": "number"
+        }
+      }
+    },
+    "MovieLikesDislikes": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visits": {
+          "type": "number"
+        },
+        "watchlists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "__v": {
+          "type": "number"
+        },
+        "numberOfLikes": {
+          "type": "number"
+        },
+        "numberOfDislikes": {
+          "type": "number"
+        }
+      }
+    },
+    "MovieLikesDislikesUser": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visits": {
+          "type": "number"
+        },
+        "watchlists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "__v": {
+          "type": "number"
+        },
+        "numberOfLikes": {
+          "type": "number"
+        },
+        "numberOfDislikes": {
+          "type": "number"
+        },
+        "likedOrDislikedUser": {
+          "type": "number"
+        }
+      }
+    },
+    "BaseUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "watchlists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "__v": {
+          "type": "number"
+        }
+      }
+    },
+    "UserMovieWatchlist": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "likes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "watchlists": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "moviesArray": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Movie"
+          }
+        },
+        "watchlistsArray": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Watchlist"
+          }
+        }
+      }
+    },
+    "MoviePaginate": {
+      "type": "object",
+      "properties": {
+        "docs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MovieLikesDislikes"
+          }
+        },
+        "nextPage": {
+          "type": "number"
+        },
+        "prevPage": {
+          "type": "number"
+        },
+        "totalDocs": {
+          "type": "number"
+        }
+      }
+    },
+    "BaseWatchlist": {
+      "type": "object",
+      "properties": {
+        "movie": {
+          "type": "string"
+        }
+      }
+    },
+    "Watchlist": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "is_watched": {
+          "type": "boolean"
+        },
+        "movie": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "__v": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
