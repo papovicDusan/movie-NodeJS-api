@@ -6,12 +6,6 @@ import commentRepo from "../repositories/comment";
 import movieRepo from "../repositories/movie";
 
 const createComment = async (dataComment: BaseComment): Promise<IComment> => {
-  const valid = validateCommentData(dataComment);
-  if (valid.error) {
-    const error: BadRequestError = new BadRequestError(valid.error.message);
-    throw error;
-  }
-
   const comment: IComment = await commentRepo.createComment(dataComment);
 
   const movie: IMovie | null = await movieRepo.findMovieAndUpdateComments(

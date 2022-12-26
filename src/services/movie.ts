@@ -31,12 +31,6 @@ const getMovies = async (
 };
 
 const createMovie = async (dataMovie: BaseMovie): Promise<IMovie> => {
-  const valid = validateMovieData(dataMovie);
-  if (valid.error) {
-    const error: BadRequestError = new BadRequestError(valid.error.message);
-    throw error;
-  }
-
   const movie: IMovie = await movieRepo.createMovie(dataMovie);
 
   return movie;

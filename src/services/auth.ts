@@ -7,12 +7,6 @@ import { validateUserData, validateLoginData } from "../utils/validations";
 import userRepo from "../repositories/user";
 
 const signup = async (userData: BaseUser): Promise<IUser> => {
-  const valid = validateUserData(userData);
-  if (valid.error) {
-    const error: BadRequestError = new BadRequestError(valid.error.message);
-    throw error;
-  }
-
   const userExists: IUser | null = await userRepo.findUserWithEmail(
     userData.email
   );
@@ -34,12 +28,6 @@ const login = async (
   email: string,
   password: string
 ): Promise<{ access: string; userId: string }> => {
-  const valid = validateLoginData({ email, password });
-  if (valid.error) {
-    const error: BadRequestError = new BadRequestError(valid.error.message);
-    throw error;
-  }
-
   const user: IUser | null = await userRepo.findUserWithEmail(email);
 
   if (!user) {

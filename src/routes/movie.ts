@@ -2,12 +2,18 @@ import isAuth from "../middleware/is-auth";
 import express from "express";
 import movieController from "../controllers/movie";
 import { tryCatch } from "../utils/try-catch";
+import { validationMovieData } from "../middleware/validation";
 
 const router = express.Router();
 
 router.get("/", isAuth, tryCatch(movieController.getMovies));
 
-router.post("/", isAuth, tryCatch(movieController.createMovie));
+router.post(
+  "/",
+  isAuth,
+  validationMovieData,
+  tryCatch(movieController.createMovie)
+);
 
 router.get(
   "/:movieId/related-movies",

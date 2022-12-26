@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { UnauthorizedError } from "../utils/app-error";
-import { StatusCodes } from "http-status-codes";
 
 interface JwtPayload {
   userId: string;
