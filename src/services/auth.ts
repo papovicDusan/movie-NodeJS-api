@@ -1,11 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User, { IUser, BaseUser, IUserMovieWatchlist } from "../models/user";
-import mongoose from "mongoose";
+import { IUser, BaseUser, IUserMovieWatchlist } from "../models/user";
 import config from "../../config";
 import { AppError } from "../utils/app-error";
 import { StatusCodes } from "http-status-codes";
 import { validateUserData, validateLoginData } from "../utils/validations";
+import userRepo from "../repositories/user";
 
 const signup = async (userData: BaseUser): Promise<IUser> => {
   const valid = validateUserData(userData);
@@ -17,9 +17,10 @@ const signup = async (userData: BaseUser): Promise<IUser> => {
     throw error;
   }
 
-  const userExists: IUser | null = await User.findOne({
-    email: userData.email,
-  });
+  const userExists: IUser | null = await userRepo.findUserWithEmail(
+    userData.email
+  );
+
   if (userExists) {
     const error: AppError = new AppError(
       `A user with email ${userData.email} exist.`,
@@ -30,13 +31,7 @@ const signup = async (userData: BaseUser): Promise<IUser> => {
 
   const hashedPw = await bcrypt.hash(userData.password, 12);
 
-  const userNew: IUser = new User({
-    email: userData.email,
-    password: hashedPw,
-    name: userData.name,
-  });
-  const user: IUser = await userNew.save();
-
+  const user: IUser = await userRepo.createUser(userData, hashedPw);
   return user;
 };
 
@@ -53,7 +48,8 @@ const login = async (
     throw error;
   }
 
-  const user: IUser | null = await User.findOne({ email: email });
+  const user: IUser | null = await userRepo.findUserWithEmail(email);
+
   if (!user) {
     const error: AppError = new AppError(
       `A user with email ${email} could not be found.`,
@@ -82,31 +78,7 @@ const login = async (
 };
 
 const getUser = async (userId: string): Promise<IUserMovieWatchlist> => {
-  const userArray: IUserMovieWatchlist[] = await User.aggregate([
-    {
-      $lookup: {
-        from: "watchlists",
-        localField: "watchlists",
-        foreignField: "_id",
-        as: "watchlistsArray",
-      },
-    },
-    {
-      $lookup: {
-        from: "movies",
-        localField: "watchlistsArray.movie",
-        foreignField: "_id",
-        as: "moviesArray",
-      },
-    },
-
-    {
-      $match: {
-        _id: new mongoose.Types.ObjectId(userId),
-      },
-    },
-  ]);
-  const user: IUserMovieWatchlist = userArray[0];
+  const user: IUserMovieWatchlist = await userRepo.getUser(userId);
 
   if (!user) {
     const error: AppError = new AppError(

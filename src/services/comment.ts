@@ -1,12 +1,10 @@
-import Comment, {
-  IComment,
-  BaseComment,
-  ICommentPaginate,
-} from "../models/comment";
-import Movie, { IMovie } from "../models/movie";
+import { IComment, BaseComment, ICommentPaginate } from "../models/comment";
+import { IMovie } from "../models/movie";
 import { AppError } from "../utils/app-error";
 import { StatusCodes } from "http-status-codes";
 import { validateCommentData } from "../utils/validations";
+import commentRepo from "../repositories/comment";
+import movieRepo from "../repositories/movie";
 
 const createComment = async (dataComment: BaseComment): Promise<IComment> => {
   const valid = validateCommentData(dataComment);
@@ -18,16 +16,11 @@ const createComment = async (dataComment: BaseComment): Promise<IComment> => {
     throw error;
   }
 
-  const commentNew: IComment = new Comment({
-    content: dataComment.content,
-    movie: dataComment.movie,
-  });
-  const comment: IComment = await commentNew.save();
+  const comment: IComment = await commentRepo.createComment(dataComment);
 
-  const movie: IMovie | null = await Movie.findOneAndUpdate(
-    { _id: dataComment.movie },
-    { $push: { comments: comment._id } },
-    { new: true }
+  const movie: IMovie | null = await movieRepo.findMovieAndUpdateComments(
+    dataComment.movie,
+    comment._id
   );
 
   if (!movie) {
@@ -46,10 +39,7 @@ const getComments = async (
   page: number,
   limit: number
 ): Promise<ICommentPaginate> => {
-  const comments: any = await Comment.paginate(
-    { movie: movieId },
-    { page: page, limit: limit }
-  );
+  const comments: any = await commentRepo.getComments(movieId, page, limit);
 
   return comments;
 };

@@ -1,21 +1,18 @@
-import Like, { ILike, BaseLike } from "../models/like";
-import Movie, { IMovie } from "../models/movie";
-import User, { IUser } from "../models/user";
+import { ILike, BaseLike } from "../models/like";
+import { IMovie } from "../models/movie";
+import { IUser } from "../models/user";
 import { AppError } from "../utils/app-error";
 import { StatusCodes } from "http-status-codes";
+import likeRepo from "../repositories/like";
+import movieRepo from "../repositories/movie";
+import userRepo from "../repositories/user";
 
 const createLike = async (dataLike: BaseLike): Promise<ILike> => {
-  const newLike: ILike = new Like({
-    like: dataLike.like,
-    movie: dataLike.movie,
-    user: dataLike.user,
-  });
-  const like: ILike = await newLike.save();
+  const like: ILike = await likeRepo.createLike(dataLike);
 
-  const movie: IMovie | null = await Movie.findOneAndUpdate(
-    { _id: dataLike.movie },
-    { $push: { likes: like._id } },
-    { new: true }
+  const movie: IMovie | null = await movieRepo.findMovieAndUpdateLikes(
+    dataLike.movie,
+    like._id
   );
 
   if (!movie) {
@@ -26,10 +23,9 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
     throw error;
   }
 
-  const user: IUser | null = await User.findOneAndUpdate(
-    { _id: dataLike.user },
-    { $push: { likes: like._id } },
-    { new: true }
+  const user: IUser | null = await userRepo.findUserAndUpdateLikes(
+    dataLike.user,
+    like._id
   );
 
   if (!user) {
@@ -44,10 +40,8 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
 };
 
 const deleteLike = async (movieId: string, userId: string): Promise<number> => {
-  const like: ILike | null = await Like.findOne({
-    user: userId,
-    movie: movieId,
-  });
+  const like: ILike | null = await likeRepo.findLike(movieId, userId);
+
   if (!like) {
     const error: AppError = new AppError(
       "Could not find like.",
@@ -56,12 +50,11 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
     throw error;
   }
 
-  const deletedLike = await Like.deleteOne({ _id: like._id });
+  const deletedLike = await likeRepo.deleteLike(like._id);
 
-  const user: IUser | null = await User.findOneAndUpdate(
-    { _id: userId },
-    { $pull: { likes: like._id } },
-    { new: true }
+  const user: IUser | null = await userRepo.findUserAndUpdateLikes(
+    userId,
+    like._id
   );
 
   if (!user) {
@@ -72,10 +65,9 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
     throw error;
   }
 
-  const movie: IMovie | null = await Movie.findOneAndUpdate(
-    { _id: movieId },
-    { $pull: { likes: like._id } },
-    { new: true }
+  const movie: IMovie | null = await movieRepo.findMovieAndUpdateLikes(
+    movieId,
+    like._id
   );
 
   if (!movie) {

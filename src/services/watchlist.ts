@@ -1,23 +1,24 @@
-import Watchlist, { IWatchlist, BaseWatchlist } from "../models/watchlist";
-import Movie, { IMovie } from "../models/movie";
-import User, { IUser } from "../models/user";
+import { IWatchlist, BaseWatchlist } from "../models/watchlist";
+import { IMovie } from "../models/movie";
+import { IUser } from "../models/user";
 import { AppError } from "../utils/app-error";
 import { StatusCodes } from "http-status-codes";
+import watchlistRepo from "../repositories/watchlist";
+import movieRepo from "../repositories/movie";
+import userRepo from "../repositories/user";
 
 const createWatchlist = async (
   dataWatchlist: BaseWatchlist
 ): Promise<IWatchlist> => {
-  const newWatchlist: IWatchlist = new Watchlist({
-    movie: dataWatchlist.movie,
-    user: dataWatchlist.user,
-  });
-  const watchlist: IWatchlist = await newWatchlist.save();
-
-  const movie: IMovie | null = await Movie.findOneAndUpdate(
-    { _id: dataWatchlist.movie },
-    { $push: { watchlists: watchlist._id } },
-    { new: true }
+  const watchlist: IWatchlist = await watchlistRepo.createWatchlist(
+    dataWatchlist
   );
+
+  const movie: IMovie | null = await movieRepo.findMovieAndUpdateWatchlistsAdd(
+    dataWatchlist.movie,
+    watchlist._id
+  );
+
   if (!movie) {
     const error: AppError = new AppError(
       "Could not find movie.",
@@ -26,11 +27,11 @@ const createWatchlist = async (
     throw error;
   }
 
-  const user: IUser | null = await User.findOneAndUpdate(
-    { _id: dataWatchlist.user },
-    { $push: { watchlists: watchlist._id } },
-    { new: true }
+  const user: IUser | null = await userRepo.findUserAndUpdateWatchlistsAdd(
+    dataWatchlist.user,
+    watchlist._id
   );
+
   if (!user) {
     const error: AppError = new AppError(
       "Could not find user.",
@@ -46,7 +47,10 @@ const deleteWatchlist = async (
   watchlistId: string,
   userId: string
 ): Promise<IWatchlist> => {
-  const watchlist: IWatchlist | null = await Watchlist.findById(watchlistId);
+  const watchlist: IWatchlist | null = await watchlistRepo.findWatchlist(
+    watchlistId
+  );
+
   if (!watchlist) {
     const error: AppError = new AppError(
       "Could not find watchlist.",
@@ -55,10 +59,9 @@ const deleteWatchlist = async (
     throw error;
   }
 
-  const user: IUser | null = await User.findOneAndUpdate(
-    { _id: userId },
-    { $pull: { watchlists: watchlist._id } },
-    { new: true }
+  const user: IUser | null = await userRepo.findUserAndUpdateWatchlistsDelete(
+    userId,
+    watchlist._id
   );
 
   if (!user) {
@@ -69,11 +72,11 @@ const deleteWatchlist = async (
     throw error;
   }
 
-  const movie: IMovie | null = await Movie.findOneAndUpdate(
-    { _id: watchlist.movie },
-    { $pull: { watchlists: watchlist._id } },
-    { new: true }
-  );
+  const movie: IMovie | null =
+    await movieRepo.findMovieAndUpdateWatchlistsDelete(
+      watchlist.movie,
+      watchlist._id
+    );
 
   if (!movie) {
     const error: AppError = new AppError(
@@ -83,16 +86,21 @@ const deleteWatchlist = async (
     throw error;
   }
 
-  const deletedWatchlst: IWatchlist = await watchlist.remove();
+  const deletedWatchlist: IWatchlist = await watchlistRepo.deleteWatchlist(
+    watchlist
+  );
 
-  return deletedWatchlst;
+  return deletedWatchlist;
 };
 
 const setWatchlistWatched = async (
   watchlistId: string,
   isWatched: boolean
 ): Promise<IWatchlist> => {
-  const watchlist: IWatchlist | null = await Watchlist.findById(watchlistId);
+  const watchlist: IWatchlist | null = await watchlistRepo.findWatchlist(
+    watchlistId
+  );
+
   if (!watchlist) {
     const error: AppError = new AppError(
       "Could not find  watchlist.",
@@ -100,10 +108,11 @@ const setWatchlistWatched = async (
     );
     throw error;
   }
-  watchlist.is_watched = isWatched;
-  await watchlist.save();
 
-  return watchlist;
+  const updateWatchlist: IWatchlist =
+    await watchlistRepo.updateWatchlistIsWatched(watchlist, isWatched);
+
+  return updateWatchlist;
 };
 
 export default {
