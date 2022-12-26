@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response, ErrorRequestHandler } from "express";
-import { AppError } from "../utils/app-error";
+import {
+  NotFoundError,
+  BadRequestError,
+  UnauthorizedError,
+} from "../utils/app-error";
 import { StatusCodes } from "http-status-codes";
 
 export const errorHandler = (
@@ -10,8 +14,20 @@ export const errorHandler = (
 ) => {
   console.log(error);
 
-  if (error instanceof AppError) {
-    return res.status(error.statusCode).json({
+  if (error instanceof NotFoundError) {
+    return res.status(StatusCodes.NOT_FOUND).json({
+      message: error.message,
+    });
+  }
+
+  if (error instanceof BadRequestError) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: error.message,
+    });
+  }
+
+  if (error instanceof UnauthorizedError) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       message: error.message,
     });
   }

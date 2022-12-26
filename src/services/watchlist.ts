@@ -1,8 +1,7 @@
 import { IWatchlist, BaseWatchlist } from "../models/watchlist";
 import { IMovie } from "../models/movie";
 import { IUser } from "../models/user";
-import { AppError } from "../utils/app-error";
-import { StatusCodes } from "http-status-codes";
+import { NotFoundError } from "../utils/app-error";
 import watchlistRepo from "../repositories/watchlist";
 import movieRepo from "../repositories/movie";
 import userRepo from "../repositories/user";
@@ -20,10 +19,7 @@ const createWatchlist = async (
   );
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
 
@@ -33,10 +29,7 @@ const createWatchlist = async (
   );
 
   if (!user) {
-    const error: AppError = new AppError(
-      "Could not find user.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find user.");
     throw error;
   }
 
@@ -52,10 +45,7 @@ const deleteWatchlist = async (
   );
 
   if (!watchlist) {
-    const error: AppError = new AppError(
-      "Could not find watchlist.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find watchlist.");
     throw error;
   }
 
@@ -65,10 +55,7 @@ const deleteWatchlist = async (
   );
 
   if (!user) {
-    const error: AppError = new AppError(
-      "Could not find user.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find user.");
     throw error;
   }
 
@@ -79,10 +66,7 @@ const deleteWatchlist = async (
     );
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
 
@@ -102,10 +86,7 @@ const setWatchlistWatched = async (
   );
 
   if (!watchlist) {
-    const error: AppError = new AppError(
-      "Could not find  watchlist.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find watchlist.");
     throw error;
   }
 

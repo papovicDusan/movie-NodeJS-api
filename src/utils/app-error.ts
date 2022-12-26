@@ -1,8 +1,17 @@
-export class AppError extends Error {
-  statusCode: number;
-
-  constructor(message: string, statusCode: number) {
+export class NotFoundError extends Error {
+  constructor(message: string) {
     super(message);
-    this.statusCode = statusCode;
+  }
+}
+
+export class BadRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class UnauthorizedError extends Error {
+  constructor(message: string) {
+    super(message);
   }
 }

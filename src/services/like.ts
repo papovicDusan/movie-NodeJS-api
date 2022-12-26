@@ -1,8 +1,7 @@
 import { ILike, BaseLike } from "../models/like";
 import { IMovie } from "../models/movie";
 import { IUser } from "../models/user";
-import { AppError } from "../utils/app-error";
-import { StatusCodes } from "http-status-codes";
+import { NotFoundError } from "../utils/app-error";
 import likeRepo from "../repositories/like";
 import movieRepo from "../repositories/movie";
 import userRepo from "../repositories/user";
@@ -16,10 +15,7 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
   );
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
 
@@ -29,10 +25,7 @@ const createLike = async (dataLike: BaseLike): Promise<ILike> => {
   );
 
   if (!user) {
-    const error: AppError = new AppError(
-      "Could not find user.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find user.");
     throw error;
   }
 
@@ -43,10 +36,7 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
   const like: ILike | null = await likeRepo.findLike(movieId, userId);
 
   if (!like) {
-    const error: AppError = new AppError(
-      "Could not find like.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find like.");
     throw error;
   }
 
@@ -58,10 +48,7 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
   );
 
   if (!user) {
-    const error: AppError = new AppError(
-      "Could not find user.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find user.");
     throw error;
   }
 
@@ -71,10 +58,7 @@ const deleteLike = async (movieId: string, userId: string): Promise<number> => {
   );
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
 

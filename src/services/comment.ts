@@ -1,7 +1,6 @@
 import { IComment, BaseComment, ICommentPaginate } from "../models/comment";
 import { IMovie } from "../models/movie";
-import { AppError } from "../utils/app-error";
-import { StatusCodes } from "http-status-codes";
+import { NotFoundError, BadRequestError } from "../utils/app-error";
 import { validateCommentData } from "../utils/validations";
 import commentRepo from "../repositories/comment";
 import movieRepo from "../repositories/movie";
@@ -9,10 +8,7 @@ import movieRepo from "../repositories/movie";
 const createComment = async (dataComment: BaseComment): Promise<IComment> => {
   const valid = validateCommentData(dataComment);
   if (valid.error) {
-    const error: AppError = new AppError(
-      valid.error.message,
-      StatusCodes.BAD_REQUEST
-    );
+    const error: BadRequestError = new BadRequestError(valid.error.message);
     throw error;
   }
 
@@ -24,10 +20,7 @@ const createComment = async (dataComment: BaseComment): Promise<IComment> => {
   );
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
 

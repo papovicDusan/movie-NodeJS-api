@@ -6,8 +6,7 @@ import {
   IMoviePopular,
 } from "../models/movie";
 import { ParsedQs } from "qs";
-import { AppError } from "../utils/app-error";
-import { StatusCodes } from "http-status-codes";
+import { NotFoundError, BadRequestError } from "../utils/app-error";
 import { validateMovieData } from "../utils/validations";
 import movieRepo from "../repositories/movie";
 
@@ -34,10 +33,7 @@ const getMovies = async (
 const createMovie = async (dataMovie: BaseMovie): Promise<IMovie> => {
   const valid = validateMovieData(dataMovie);
   if (valid.error) {
-    const error: AppError = new AppError(
-      valid.error.message,
-      StatusCodes.BAD_REQUEST
-    );
+    const error: BadRequestError = new BadRequestError(valid.error.message);
     throw error;
   }
 
@@ -53,10 +49,7 @@ const getMovie = async (
   const movie: IMovie | null = await movieRepo.findMovie(movieId);
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
   const movieLikesDislikes: IMovieLikesDislikesUser = await movieRepo.getMovie(
@@ -71,10 +64,7 @@ const getMoviesGenre = async (movieId: string): Promise<IMovie[]> => {
   const movie: IMovie | null = await movieRepo.findMovie(movieId);
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
   const movies = await movieRepo.getMoviesGenre(movie.genre);
@@ -90,10 +80,7 @@ const setMovieVisits = async (movieId: string): Promise<IMovie> => {
   const movie: IMovie | null = await movieRepo.findMovie(movieId);
 
   if (!movie) {
-    const error: AppError = new AppError(
-      "Could not find movie.",
-      StatusCodes.NOT_FOUND
-    );
+    const error: NotFoundError = new NotFoundError("Could not find movie.");
     throw error;
   }
 
