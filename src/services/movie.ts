@@ -6,8 +6,7 @@ import {
   IMoviePopular,
 } from "../models/movie";
 import { ParsedQs } from "qs";
-import { NotFoundError, BadRequestError } from "../utils/app-error";
-import { validateMovieData } from "../utils/validations";
+import { NotFoundError } from "../utils/app-error";
 import movieRepo from "../repositories/movie";
 
 const getMovies = async (

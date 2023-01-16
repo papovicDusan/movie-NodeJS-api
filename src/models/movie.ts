@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { IComment } from "./comment";
 import paginate from "mongoose-paginate-v2";
 
 export interface BaseMovie {

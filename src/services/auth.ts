@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { IUser, BaseUser, IUserMovieWatchlist } from "../models/user";
 import config from "../../config";
 import { NotFoundError, BadRequestError } from "../utils/app-error";
-import { validateUserData, validateLoginData } from "../utils/validations";
 import userRepo from "../repositories/user";
 
 const signup = async (userData: BaseUser): Promise<IUser> => {

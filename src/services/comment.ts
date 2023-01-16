@@ -1,7 +1,6 @@
 import { IComment, BaseComment, ICommentPaginate } from "../models/comment";
 import { IMovie } from "../models/movie";
-import { NotFoundError, BadRequestError } from "../utils/app-error";
-import { validateCommentData } from "../utils/validations";
+import { NotFoundError } from "../utils/app-error";
 import commentRepo from "../repositories/comment";
 import movieRepo from "../repositories/movie";
 
